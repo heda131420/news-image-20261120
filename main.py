@@ -1,20 +1,26 @@
-"""News-image entry: copy the front page to the grader's output folder.
+"""Ship the finished front page to the grader.
 
-The image itself is the entry: a newspaper front page that sums up
-Friday 20 November 2026, drawn once and shipped as entry.png beside
-this file. The program runs with no network and no third-party code, so
-it only copies those exact bytes to the output directory.
+The picture is the entry: a one-page newspaper that sums up Friday
+20 November 2026, rendered once and stored here as entry.png. The
+grader runs this file with no network and nothing beyond the standard
+library, so the program only places those exact bytes in the output
+folder the grader provides. Run it locally with
+MAKEFUN_OUTPUT_DIR=out python3 main.py to see the same result."""
 
-Local run:
-    mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
-"""
+from os import environ
+from pathlib import Path
 
-import os
-import shutil
+HERE = Path(__file__).resolve().parent
+PICTURE = HERE / "entry.png"
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-SOURCE = os.path.join(HERE, "entry.png")
-TARGET_DIR = os.environ.get("MAKEFUN_OUTPUT_DIR") or "/output"
 
-os.makedirs(TARGET_DIR, exist_ok=True)
-shutil.copyfile(SOURCE, os.path.join(TARGET_DIR, "entry.png"))
+def main() -> None:
+    if not PICTURE.is_file():
+        raise SystemExit("entry.png is missing next to main.py")
+    target_dir = Path(environ.get("MAKEFUN_OUTPUT_DIR") or "/output")
+    target_dir.mkdir(parents=True, exist_ok=True)
+    (target_dir / "entry.png").write_bytes(PICTURE.read_bytes())
+
+
+if __name__ == "__main__":
+    main()
